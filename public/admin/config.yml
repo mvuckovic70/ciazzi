@@ -1,0 +1,140 @@
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/ciazzi       # ← promeni
+  branch: main
+  # Cloudflare Pages automatski deployuje na svaki push
+
+# Decap CMS radi direktno u browseru — čita/piše u GitHub repo
+# bez ikakvog servera. Otvori: ciazzi.com/admin/
+
+media_folder: public/media               # lokalni upload za dev
+public_folder: /media                    # URL prefix u produkiciji
+                                         # Za R2: zameni oba sa R2 URL-om
+
+collections:
+  - name: days
+    label: "Dani / Days"
+    label_singular: "Dan / Day"
+    folder: src/content/days
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}"
+    extension: mdx
+    format: frontmatter
+    editor:
+      preview: false                     # Astro preview nije podržan u Decapu
+    
+    fields:
+      - { label: "Datum", name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD.MM.YYYY", time_format: false }
+      - { label: "Slug (URL)", name: slug, widget: string, hint: "Format: DD-MM-YYYY, npr. 15-03-2025" }
+      
+      - label: "Kategorije"
+        name: categories
+        widget: select
+        multiple: true
+        options: [tragedija, pokret, korupcija, policija, politika, svet]
+      
+      - { label: "Važan (pinned)", name: important, widget: boolean, default: false }
+      
+      - label: "Thumbnail"
+        name: thumbnail
+        widget: object
+        fields:
+          - { label: "Slika (URL ili upload)", name: src, widget: string }
+          - label: "Tip"
+            name: type
+            widget: select
+            options: [foto, video, grafika]
+          - label: "Alt tekst (po jeziku)"
+            name: alt
+            widget: object
+            fields:
+              - { label: "Srpski", name: sr, widget: string }
+              - { label: "Engleski", name: en, widget: string }
+              - { label: "Nemački", name: de, widget: string }
+              - { label: "Francuski", name: fr, widget: string }
+              - { label: "Italijanski", name: it, widget: string }
+              - { label: "Španski", name: es, widget: string }
+      
+      - label: "Naslov (po jeziku)"
+        name: title
+        widget: object
+        fields:
+          - { label: "Srpski", name: sr, widget: string }
+          - { label: "Engleski", name: en, widget: string }
+          - { label: "Nemački", name: de, widget: string }
+          - { label: "Francuski", name: fr, widget: string }
+          - { label: "Italijanski", name: it, widget: string }
+          - { label: "Španski", name: es, widget: string }
+      
+      - label: "Lead / Sažetak"
+        name: lead
+        widget: object
+        fields:
+          - { label: "Srpski", name: sr, widget: text }
+          - { label: "Engleski", name: en, widget: text }
+          - { label: "Nemački", name: de, widget: text }
+          - { label: "Francuski", name: fr, widget: text }
+          - { label: "Italijanski", name: it, widget: text }
+          - { label: "Španski", name: es, widget: text }
+      
+      - label: "Činjenice"
+        name: facts
+        widget: object
+        required: false
+        fields:
+          - label: "Srpski"
+            name: sr
+            widget: list
+            field: { label: "Činjenica", name: text, widget: string }
+          - label: "Engleski"
+            name: en
+            widget: list
+            required: false
+            field: { label: "Fact", name: text, widget: string }
+      
+      - label: "Navodi (sporni)"
+        name: claims
+        widget: object
+        required: false
+        fields:
+          - label: "Srpski"
+            name: sr
+            widget: list
+            required: false
+            fields:
+              - { label: "Tekst navoda", name: text, widget: string }
+              - { label: "Sporno", name: disputed, widget: boolean, default: true }
+          - label: "Engleski"
+            name: en
+            widget: list
+            required: false
+            fields:
+              - { label: "Claim text", name: text, widget: string }
+              - { label: "Disputed", name: disputed, widget: boolean, default: true }
+      
+      - label: "Citati"
+        name: quotes
+        widget: list
+        required: false
+        fields:
+          - label: "Tekst citata"
+            name: text
+            widget: object
+            fields:
+              - { label: "Srpski", name: sr, widget: text }
+              - { label: "Engleski", name: en, widget: text }
+          - { label: "Atribucija", name: attribution, widget: string }
+          - { label: "Verifikovano", name: verified, widget: boolean, default: false }
+      
+      - label: "Izvori"
+        name: sources
+        widget: list
+        fields:
+          - { label: "Naziv izvora", name: label, widget: string }
+          - { label: "URL", name: url, widget: string, required: false }
+          - { label: "Archive URL", name: archiveUrl, widget: string, required: false }
+          - { label: "Pouzdan", name: reliable, widget: boolean, default: true }
+      
+      - label: "Tekst (srpski narativ)"
+        name: body
+        widget: markdown

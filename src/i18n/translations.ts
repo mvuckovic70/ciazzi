@@ -1,0 +1,141 @@
+export const LANGS = ['sr', 'en', 'de', 'fr', 'it', 'es'] as const;
+export type Lang = typeof LANGS[number];
+
+export const LANG_LABELS: Record<Lang, string> = {
+  sr: 'SR', en: 'EN', de: 'DE', fr: 'FR', it: 'IT', es: 'ES',
+};
+
+export const t: Record<Lang, Record<string, string>> = {
+  sr: {
+    tagline: 'Hronika otpora — od 1.11.2024.',
+    heroKicker: '1. novembar 2024.',
+    heroTitle: 'U 11.52 pala je nadstrešnica. Šesnaest života. Probudila se zemlja.',
+    heroLead: 'Dnevnik jedne pobune — dan za danom, sve ono što su pokušali da sakriju.',
+    statDays: 'dana otpora', statLives: 'izgubljenih života', statLangs: 'jezika',
+    silence: 'Svaki dan u 11.52 — minut tišine za svaki život.',
+    secTitle: 'Dnevnik', secSub: 'Svaki dan ima svoju stranicu. Uđi i pročitaj priču.',
+    fAll: 'Sve', fTra: 'Tragedija', fMov: 'Pokret', fCor: 'Korupcija',
+    fPol: 'Policija', fPlt: 'Politika', fWld: 'Svet',
+    readMore: 'Uđi u dan', back: 'Nazad na dnevnik',
+    factLabel: 'Šta znamo — činjenice', claimLabel: 'Šta se tvrdi — navodi',
+    sourcesLabel: 'IZVORI', disputed: 'ostaje sporno',
+    mediaFoto: 'FOTO', mediaVideo: 'VIDEO', mediaGrafika: 'GRAFIKA',
+    aboutName: 'O imenu', aboutNameShort: 'Zašto ciazzi?',
+    skipToContent: 'Preskoči na sadržaj',
+    metaDesc: 'Dnevnik otpora — hronika pada nadstrešnice u Novom Sadu i studentskog pokreta koji je probudio Srbiju.',
+  },
+  en: {
+    tagline: 'A chronicle of resistance — since 1 Nov 2024.',
+    heroKicker: '1 November 2024',
+    heroTitle: 'At 11:52 the canopy fell. Sixteen lives. A nation woke up.',
+    heroLead: 'The diary of an uprising — day by day, everything they tried to hide.',
+    statDays: 'days of resistance', statLives: 'lives lost', statLangs: 'languages',
+    silence: 'Every day at 11:52 — a minute of silence for every life.',
+    secTitle: 'The Diary', secSub: 'Every day has its own page. Step in and read the story.',
+    fAll: 'All', fTra: 'Tragedy', fMov: 'Movement', fCor: 'Corruption',
+    fPol: 'Police', fPlt: 'Politics', fWld: 'World',
+    readMore: 'Open this day', back: 'Back to the diary',
+    factLabel: 'What we know — facts', claimLabel: 'What is alleged — claims',
+    sourcesLabel: 'SOURCES', disputed: 'remains disputed',
+    mediaFoto: 'PHOTO', mediaVideo: 'VIDEO', mediaGrafika: 'GRAPHIC',
+    aboutName: 'About the name', aboutNameShort: 'Why ciazzi?',
+    skipToContent: 'Skip to content',
+    metaDesc: 'Diary of resistance — a chronicle of the Novi Sad station collapse and the student movement that awoke Serbia.',
+  },
+  de: {
+    tagline: 'Chronik des Widerstands — seit 1.11.2024.',
+    heroKicker: '1. November 2024',
+    heroTitle: 'Um 11:52 stürzte das Vordach ein. Sechzehn Leben. Ein Land erwachte.',
+    heroLead: 'Das Tagebuch eines Aufstands — Tag für Tag, alles, was sie verbergen wollten.',
+    statDays: 'Tage des Widerstands', statLives: 'verlorene Leben', statLangs: 'Sprachen',
+    silence: 'Jeden Tag um 11:52 — eine Minute Stille für jedes Leben.',
+    secTitle: 'Das Tagebuch', secSub: 'Jeder Tag hat seine eigene Seite. Tritt ein und lies die Geschichte.',
+    fAll: 'Alle', fTra: 'Tragödie', fMov: 'Bewegung', fCor: 'Korruption',
+    fPol: 'Polizei', fPlt: 'Politik', fWld: 'Welt',
+    readMore: 'Diesen Tag öffnen', back: 'Zurück zum Tagebuch',
+    factLabel: 'Was wir wissen — Fakten', claimLabel: 'Was behauptet wird — Vorwürfe',
+    sourcesLabel: 'QUELLEN', disputed: 'bleibt umstritten',
+    mediaFoto: 'FOTO', mediaVideo: 'VIDEO', mediaGrafika: 'GRAFIK',
+    aboutName: 'Über den Namen', aboutNameShort: 'Warum ciazzi?',
+    skipToContent: 'Zum Inhalt springen',
+    metaDesc: 'Tagebuch des Widerstands — Chronik des Einsturzes in Novi Sad und der Studentenbewegung.',
+  },
+  fr: {
+    tagline: 'Chronique d\'une résistance — depuis le 1.11.2024.',
+    heroKicker: '1er novembre 2024',
+    heroTitle: 'À 11h52, l\'auvent s\'est effondré. Seize vies. Un pays s\'est réveillé.',
+    heroLead: 'Le journal d\'un soulèvement — jour après jour, tout ce qu\'ils ont tenté de cacher.',
+    statDays: 'jours de résistance', statLives: 'vies perdues', statLangs: 'langues',
+    silence: 'Chaque jour à 11h52 — une minute de silence pour chaque vie.',
+    secTitle: 'Le Journal', secSub: 'Chaque jour a sa page. Entrez et lisez l\'histoire.',
+    fAll: 'Tout', fTra: 'Tragédie', fMov: 'Mouvement', fCor: 'Corruption',
+    fPol: 'Police', fPlt: 'Politique', fWld: 'Monde',
+    readMore: 'Ouvrir ce jour', back: 'Retour au journal',
+    factLabel: 'Ce que nous savons — faits', claimLabel: 'Ce qui est allégué — accusations',
+    sourcesLabel: 'SOURCES', disputed: 'reste contesté',
+    mediaFoto: 'PHOTO', mediaVideo: 'VIDÉO', mediaGrafika: 'GRAPHIQUE',
+    aboutName: 'À propos du nom', aboutNameShort: 'Pourquoi ciazzi ?',
+    skipToContent: 'Aller au contenu',
+    metaDesc: 'Journal de résistance — chronique de l\'effondrement de Novi Sad et du mouvement étudiant.',
+  },
+  it: {
+    tagline: 'Cronaca di una resistenza — dal 1.11.2024.',
+    heroKicker: '1 novembre 2024',
+    heroTitle: 'Alle 11:52 la pensilina è crollata. Sedici vite. Un paese si è svegliato.',
+    heroLead: 'Il diario di una rivolta — giorno dopo giorno, tutto ciò che hanno cercato di nascondere.',
+    statDays: 'giorni di resistenza', statLives: 'vite perdute', statLangs: 'lingue',
+    silence: 'Ogni giorno alle 11:52 — un minuto di silenzio per ogni vita.',
+    secTitle: 'Il Diario', secSub: 'Ogni giorno ha la sua pagina. Entra e leggi la storia.',
+    fAll: 'Tutti', fTra: 'Tragedia', fMov: 'Movimento', fCor: 'Corruzione',
+    fPol: 'Polizia', fPlt: 'Politica', fWld: 'Mondo',
+    readMore: 'Apri il giorno', back: 'Torna al diario',
+    factLabel: 'Ciò che sappiamo — fatti', claimLabel: 'Ciò che si sostiene — accuse',
+    sourcesLabel: 'FONTI', disputed: 'rimane controverso',
+    mediaFoto: 'FOTO', mediaVideo: 'VIDEO', mediaGrafika: 'GRAFICA',
+    aboutName: 'Sul nome', aboutNameShort: 'Perché ciazzi?',
+    skipToContent: 'Vai al contenuto',
+    metaDesc: 'Diario di resistenza — cronaca del crollo di Novi Sad e del movimento studentesco.',
+  },
+  es: {
+    tagline: 'Crónica de una resistencia — desde el 1.11.2024.',
+    heroKicker: '1 de noviembre de 2024',
+    heroTitle: 'A las 11:52 cayó la marquesina. Dieciséis vidas. Un país despertó.',
+    heroLead: 'El diario de una revuelta — día a día, todo lo que intentaron ocultar.',
+    statDays: 'días de resistencia', statLives: 'vidas perdidas', statLangs: 'idiomas',
+    silence: 'Cada día a las 11:52 — un minuto de silencio por cada vida.',
+    secTitle: 'El Diario', secSub: 'Cada día tiene su página. Entra y lee la historia.',
+    fAll: 'Todo', fTra: 'Tragedia', fMov: 'Movimiento', fCor: 'Corrupción',
+    fPol: 'Policía', fPlt: 'Política', fWld: 'Mundo',
+    readMore: 'Abrir el día', back: 'Volver al diario',
+    factLabel: 'Lo que sabemos — hechos', claimLabel: 'Lo que se alega — acusaciones',
+    sourcesLabel: 'FUENTES', disputed: 'sigue siendo disputado',
+    mediaFoto: 'FOTO', mediaVideo: 'VIDEO', mediaGrafika: 'GRÁFICO',
+    aboutName: 'Sobre el nombre', aboutNameShort: '¿Por qué ciazzi?',
+    skipToContent: 'Ir al contenido',
+    metaDesc: 'Diario de resistencia — crónica del derrumbe de Novi Sad y el movimiento estudiantil.',
+  },
+};
+
+export function useTranslation(lang: Lang) {
+  return (key: string) => t[lang][key] ?? t['sr'][key] ?? key;
+}
+
+// Format a date string "2024-11-01" for display per locale
+export function formatDate(isoDate: string, lang: Lang): string {
+  const localeMap: Record<Lang, string> = {
+    sr: 'sr-RS', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', es: 'es-ES',
+  };
+  return new Date(isoDate).toLocaleDateString(localeMap[lang], {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+
+// Category label per lang — matches schema enum values
+export const CAT_LABELS: Record<Lang, Record<string, string>> = {
+  sr: { tragedija:'Tragedija', pokret:'Pokret', korupcija:'Korupcija', policija:'Policija', politika:'Politika', svet:'Svet' },
+  en: { tragedija:'Tragedy', pokret:'Movement', korupcija:'Corruption', policija:'Police', politika:'Politics', svet:'World' },
+  de: { tragedija:'Tragödie', pokret:'Bewegung', korupcija:'Korruption', policija:'Polizei', politika:'Politik', svet:'Welt' },
+  fr: { tragedija:'Tragédie', pokret:'Mouvement', korupcija:'Corruption', policija:'Police', politika:'Politique', svet:'Monde' },
+  it: { tragedija:'Tragedia', pokret:'Movimento', korupcija:'Corruzione', policija:'Polizia', politika:'Politica', svet:'Mondo' },
+  es: { tragedija:'Tragedia', pokret:'Movimiento', korupcija:'Corrupción', policija:'Policía', politika:'Política', svet:'Mundo' },
+};

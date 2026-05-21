@@ -1,0 +1,2 @@
+# /sr/* → /* (301) — prevents duplicate content if user types /sr/ manually
+/sr/*   /:splat   301
