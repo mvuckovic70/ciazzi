@@ -14,18 +14,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'ciazzi-app/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ciazzi-app
         run: npm ci
 
       - name: Build
-        working-directory: ciazzi-app
         run: npm run build
 
       - name: Deploy to Cloudflare Workers
-        working-directory: ciazzi-app
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
