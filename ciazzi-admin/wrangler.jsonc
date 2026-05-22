@@ -1,0 +1,14 @@
+{
+  "name": "ciazzi-admin",
+  "main": "src/index.js",
+  "compatibility_date": "2026-05-21",
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "ciazzi-media"
+    }
+  ],
+  "rules": [
+    { "type": "Text", "globs": ["**/*.html"], "fallthrough": false }
+  ]
+}
