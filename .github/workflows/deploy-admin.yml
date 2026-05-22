@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ciazzi-app/ciazzi-admin/**'
+      - 'ciazzi-admin/**'
 
 jobs:
   deploy:
@@ -15,9 +15,9 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: npm ci --prefix ciazzi-app/ciazzi-admin
+        run: npm ci --prefix ciazzi-admin
       - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy --config ciazzi-app/ciazzi-admin/wrangler.jsonc
+        run: npx wrangler deploy --config ciazzi-admin/wrangler.jsonc
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
