@@ -1,0 +1,25 @@
+name: Deploy ciazzi-admin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ciazzi-admin/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: ciazzi-admin
+        run: npm ci
+      - name: Deploy to Cloudflare Workers
+        working-directory: ciazzi-admin
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
