@@ -414,8 +414,8 @@ function parseMDX(raw) {
     const obj = {};
     const lines = blockMatch[1].split('\n');
     lines.forEach(line => {
-      const m = line.match(/^\s+(\w+):\s*"?(.*?)"?\s*$/);
-      if (m) obj[m[1]] = m[2];
+      const m = line.match(/^\s+(\w+):\s*['"]?(.*?)['"]?\s*$/);
+      if (m) obj[m[1]] = m[2].replace(/''/g, "'");
     });
     return obj;
   }
@@ -461,7 +461,7 @@ function parseMDX(raw) {
     lead: extractLangBlock('lead'),
     facts: { sr: factsSR },
     claims: { sr: claimsSR },
-    quotes: [],
+    quotes: parseQuotesFromFM(fm),
     sources: extractSourcesFromFM(fm),
     body,
   };
