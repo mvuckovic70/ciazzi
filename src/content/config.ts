@@ -64,7 +64,7 @@ const days = defineCollection({
 
       quotes: z.array(z.object({
         text:         langStr,
-        attribution:  langStr,
+        attribution:  z.union([langStr, z.string()]),
         verified:     z.boolean().default(false),
       })).optional(),
 
