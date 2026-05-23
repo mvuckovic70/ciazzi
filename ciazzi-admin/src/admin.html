@@ -652,7 +652,7 @@ function collectForm() {
   // Quotes
   const quotes = [...document.querySelectorAll('#quotes-list .card')].map(card => ({
     text: { sr: card.querySelector('.q-sr').value, en: card.querySelector('.q-en').value },
-    attribution: card.querySelector('.q-attr').value,
+    attribution: { sr: card.querySelector('.q-attr').value },
     verified: card.querySelector('.q-verified').checked,
   })).filter(q => q.text.sr || q.text.en);
 
