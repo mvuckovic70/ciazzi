@@ -90,14 +90,14 @@ async function upsertDayToGitHub(env, date, content, existingSha) {
 
 function buildMDX(data) {
   const LANGS = ['sr', 'en', 'de', 'fr', 'it', 'es'];
-
+  function yamlStr(s) { return "'" + String(s || '').replace(/'/g, "''") + "'"; }
   function langBlock(obj, indent = '  ') {
     return LANGS.map(l => {
       const val = (obj && obj[l]) ? obj[l].replace(/"/g, '\\"') : '';
       return `${indent}${l}: "${val}"`;
     }).join('\n');
   }
-
+  
   function langBlockOptional(obj, indent = '  ') {
     return LANGS.map(l => {
       const val = (obj && obj[l]) ? obj[l].replace(/"/g, '\\"') : '';
@@ -188,9 +188,16 @@ ${langBlock(data.lead)}
     fm += '\nsources:\n  - label: "TODO"\n    reliable: true\n';
   }
 
+  if (data.bodyTranslations && Object.values(data.bodyTranslations).some(v => v)) {
+    fm += '\nbodyTranslations:\n';
+    LANGS.forEach(l => {
+      const val = data.bodyTranslations[l];
+      if (val) fm += `  ${l}: ${yamlStr(val)}\n`;
+    });
+  }
+
   fm += '---\n\n';
   fm += (data.body || 'TODO: Napiši narativ.\n');
-
   return fm;
 }
 
