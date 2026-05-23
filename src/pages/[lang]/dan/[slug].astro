@@ -27,8 +27,26 @@ const facts    = data.facts?.[lang]  ?? data.facts?.['sr']  ?? [];
 const claims   = data.claims?.[lang] ?? data.claims?.['sr'] ?? [];
 const quotes   = data.quotes ?? [];
 
+// Body: use translated version if available, else fall back to MDX Content
+const translatedBody = data.bodyTranslations?.[lang] ?? null;
+
+function renderMarkdown(text: string): string {
+  return text
+    .split(/\n\n+/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
+    .map(p => {
+      // Headings
+      if (p.startsWith('## ')) return `<h2>${p.slice(3)}</h2>`;
+      if (p.startsWith('# ')) return `<h1>${p.slice(2)}</h1>`;
+      // Paragraph with line breaks
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('\n');
+}
+
 const homeUrl  = lang === 'sr' ? '/' : `/${lang}`;
-const canon    = `/dan/${slug}`; // slug here is already URL format DD-MM-YYYY
+const canon    = `/dan/${slug}`;
 
 // Category color map
 const CAT_COLORS: Record<string, string> = {
@@ -65,7 +83,7 @@ const CAT_BG: Record<string, string> = {
 
     <p class="day-lead">{lead}</p>
 
-    <!-- Media gallery (thumbnails; embeds handled below) -->
+    <!-- Media gallery -->
     {data.media && data.media.length > 0 && (
       <div class="gallery">
         {data.media.slice(0, 6).map(item => (
@@ -121,9 +139,12 @@ const CAT_BG: Record<string, string> = {
       </div>
     )}
 
-    <!-- Long-form body (MDX) -->
+    <!-- Long-form body -->
     <div class="prose">
-      <Content />
+      {translatedBody
+        ? <Fragment set:html={renderMarkdown(translatedBody)} />
+        : <Content />
+      }
     </div>
 
     <!-- Quotes -->
