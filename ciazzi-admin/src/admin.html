@@ -877,14 +877,18 @@ async function autoTranslateAll() {
         const srText = quoteCards[i].querySelector('.q-sr').value;
         const attr = quoteCards[i].querySelector('.q-attr').value;
         const verified = quoteCards[i].querySelector('.q-verified').checked;
+        const qtrans = { text: { sr: srText }, attribution: { sr: attr }, verified };
         if (srText) {
           const t = await translateField('quote', srText);
-          const qtrans = { text: { sr: srText }, attribution: { sr: attr }, verified };
           LANGS.forEach(l => { if (t[l]) qtrans.text[l] = t[l]; });
-          _translatedQuotes.push(qtrans);
           const enEl = quoteCards[i].querySelector('.q-en');
           if (enEl && t.en) enEl.value = t.en;
         }
+        if (attr) {
+          const ta = await translateField('attribution', attr);
+          LANGS.forEach(l => { if (ta[l]) qtrans.attribution[l] = ta[l]; });
+        }
+        _translatedQuotes.push(qtrans);
       }
     }
 
