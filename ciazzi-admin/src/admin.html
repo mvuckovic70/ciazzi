@@ -601,7 +601,7 @@ function addQuoteItem(q = {}) {
       <div class="field"><label>Tekst (EN)</label><textarea rows="2" class="q-en">${esc((q.text&&q.text.en)||'')}</textarea></div>
     </div>
     <div class="row">
-      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(q.attribution||'')}"></div>
+      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(typeof q.attribution === 'object' ? (q.attribution.sr||'') : (q.attribution||''))}"></div>
       <div class="check-row" style="margin-top:18px"><input type="checkbox" class="q-verified" ${q.verified?'checked':''} style="width:auto;accent-color:var(--accent)"><label>Verifikovan</label></div>
     </div>`;
   document.getElementById('quotes-list').appendChild(el);
