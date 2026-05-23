@@ -479,6 +479,7 @@ function extractSourcesFromFM(fm) {
   });
   return sources;
 }
+
 function parseQuotesFromFM(fm) {
   const quotes = [];
   const qBlock = fm.match(/^quotes:\s*\n([\s\S]*?)(?=^\w)/m);
