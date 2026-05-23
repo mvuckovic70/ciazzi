@@ -154,7 +154,7 @@ const CAT_BG: Record<string, string> = {
           {q.text[lang] ?? q.text['sr']}
         </blockquote>
         <figcaption>
-          — {q.attribution}
+          — {(q.attribution as any)[lang] ?? (q.attribution as any)['sr'] ?? q.attribution}
           {!q.verified && <span class="note">(navod · nije verifikovan)</span>}
         </figcaption>
       </figure>
