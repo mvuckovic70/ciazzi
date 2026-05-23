@@ -138,7 +138,7 @@ const ogImg = ogImage ?? `${base}/og-default.jpg`;
     <nav aria-label="Language selector" style="display:flex;gap:4px;">
       {LANGS.map((l) => (
         <a
-          href={l === 'sr' ? `/${slug}` : `/${l}${slug}`}
+          href={l === 'sr' ? (slug ? slug : '/') : `/${l}${slug}`}
           aria-current={l === lang ? 'true' : undefined}
           style={`font-size:12px;padding:4px 8px;border-radius:var(--radius-sm);border:0.5px solid ${
             l === lang ? 'var(--accent)' : 'var(--border)'
