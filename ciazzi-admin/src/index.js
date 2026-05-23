@@ -71,13 +71,17 @@ async function listDaysFromGitHub(env) {
 
 async function upsertDayToGitHub(env, date, content, existingSha) {
   const filePath = `src/content/days/${date}.mdx`;
-  // Remove BOM and control chars, then UTF-8 safe base64
+  
+  // Ako SHA nije prosleđen, fetchuj ga
+  if (!existingSha) {
+    const existing = await getFileFromGitHub(env, filePath);
+    if (existing) existingSha = existing.sha;
+  }
+
   const cleanContent = content.replace(/^\uFEFF/, '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
   const encoded = btoa(unescape(encodeURIComponent(cleanContent)));
   const body = {
-    message: existingSha
-      ? `update: dan ${date}`
-      : `add: dan ${date}`,
+    message: existingSha ? `update: dan ${date}` : `add: dan ${date}`,
     content: encoded,
     branch: env.GITHUB_BRANCH || 'main',
   };
