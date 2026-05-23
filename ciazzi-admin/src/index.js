@@ -180,7 +180,7 @@ ${langBlock(data.lead)}
   if (data.sources && data.sources.length) {
     fm += '\nsources:\n';
     data.sources.forEach(s => {
-      fm += `  - label: "${(s.label || '').replace(/"/g, '\\"')}"\n`;
+      fm += `  - label: ${yamlStr(s.label || '')}\n`;
       if (s.url) fm += `    url: "${s.url}"\n`;
       if (s.archiveUrl) fm += `    archiveUrl: "${s.archiveUrl}"\n`;
       fm += `    reliable: ${s.reliable !== false ? 'true' : 'false'}\n`;
