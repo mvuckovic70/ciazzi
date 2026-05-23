@@ -97,19 +97,16 @@ function buildMDX(data) {
   function yamlStr(s) { return "'" + String(s || '').replace(/'/g, "''") + "'"; }
   function langBlock(obj, indent = '  ') {
     return LANGS.map(l => {
-      const val = (obj && obj[l]) ? obj[l].replace(/"/g, '\\"') : '';
-      return `${indent}${l}: "${val}"`;
+      const val = (obj && obj[l]) || '';
+      return `${indent}${l}: ${yamlStr(val)}`;
     }).join('\n');
   }
-  
+
   function langBlockOptional(obj, indent = '  ') {
     return LANGS.map(l => {
-      const val = (obj && obj[l]) ? obj[l].replace(/"/g, '\\"') : '';
-      return `${indent}${l}: "${val}"`;
-    }).filter((_, i) => {
-      const l = LANGS[i];
-      return obj && obj[l];
-    }).join('\n');
+      const val = (obj && obj[l]) || '';
+      return `${indent}${l}: ${yamlStr(val)}`;
+    }).filter((_, i) => obj && obj[LANGS[i]]).join('\n');
   }
 
   let fm = `---
@@ -139,7 +136,7 @@ ${langBlock(data.lead)}
       if (items && items.length) {
         fm += `  ${l}:\n`;
         items.forEach(item => {
-          fm += `    - "${item.replace(/"/g, '\\"')}"\n`;
+          fm += `    - ${yamlStr(item)}\n`;
         });
       }
     });
