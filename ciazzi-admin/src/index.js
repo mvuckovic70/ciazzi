@@ -492,12 +492,15 @@ function parseQuotesFromFM(fm) {
       if (m) text[l] = m[1].replace(/''/g, "'");
     });
     const attrBlock = {};
-    const attrMatch = item.match(/attribution:\s*\n((?:\s+\w+:.*\n?)*)/);
-    if (attrMatch) {
+    const attrLangMatch = item.match(/attribution:\s*\n((?:\s+\w+:.*\n?)*)/);
+    const attrStrMatch = item.match(/attribution:\s*'((?:[^']|'')*)'/);
+    if (attrLangMatch) {
       ['sr','en','de','fr','it','es'].forEach(l => {
-        const m = attrMatch[1].match(new RegExp(`\\s+${l}:\\s*'((?:[^']|'')*)'`));
+        const m = attrLangMatch[1].match(new RegExp(`\\s+${l}:\\s*'((?:[^']|'')*)'`));
         if (m) attrBlock[l] = m[1].replace(/''/g, "'");
       });
+    } else if (attrStrMatch) {
+      attrBlock.sr = attrStrMatch[1].replace(/''/g, "'");
     }
     const verifiedM = item.match(/verified:\s*(true|false)/);
     if (Object.keys(text).length) {
