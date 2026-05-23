@@ -151,7 +151,7 @@ ${langBlock(data.lead)}
       if (items && items.length) {
         fm += `  ${l}:\n`;
         items.forEach(item => {
-          fm += `    - text: "${(item.text || '').replace(/"/g, '\\"')}"\n`;
+          fm += `    - text: ${yamlStr(item.text || '')}\n`;
           fm += `      disputed: ${item.disputed !== false ? 'true' : 'false'}\n`;
         });
       }
