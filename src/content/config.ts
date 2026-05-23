@@ -74,6 +74,7 @@ const days = defineCollection({
         archiveUrl: z.string().optional(),
         reliable:   z.boolean().default(true),
       })),
+      bodyTranslations: langStr.optional(),
     }),
 });
 
