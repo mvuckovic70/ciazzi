@@ -479,3 +479,33 @@ function extractSourcesFromFM(fm) {
   });
   return sources;
 }
+function parseQuotesFromFM(fm) {
+  const quotes = [];
+  const qBlock = fm.match(/^quotes:\s*\n([\s\S]*?)(?=^\w)/m);
+  if (!qBlock) return quotes;
+  const items = qBlock[1].split(/\n  - /).filter(s => s.trim());
+  items.forEach(item => {
+    const text = {};
+    ['sr','en','de','fr','it','es'].forEach(l => {
+      const m = item.match(new RegExp(`\\s*${l}:\\s*'((?:[^']|'')*)'`));
+      if (m) text[l] = m[1].replace(/''/g, "'");
+    });
+    const attrBlock = {};
+    const attrMatch = item.match(/attribution:\s*\n((?:\s+\w+:.*\n?)*)/);
+    if (attrMatch) {
+      ['sr','en','de','fr','it','es'].forEach(l => {
+        const m = attrMatch[1].match(new RegExp(`\\s+${l}:\\s*'((?:[^']|'')*)'`));
+        if (m) attrBlock[l] = m[1].replace(/''/g, "'");
+      });
+    }
+    const verifiedM = item.match(/verified:\s*(true|false)/);
+    if (Object.keys(text).length) {
+      quotes.push({
+        text,
+        attribution: Object.keys(attrBlock).length ? attrBlock : {},
+        verified: verifiedM ? verifiedM[1] === 'true' : false,
+      });
+    }
+  });
+  return quotes;
+}
