@@ -879,7 +879,7 @@ async function autoTranslateAll() {
         const verified = quoteCards[i].querySelector('.q-verified').checked;
         if (srText) {
           const t = await translateField('quote', srText);
-          const qtrans = { text: { sr: srText }, attribution: attr, verified };
+          const qtrans = { text: { sr: srText }, attribution: { sr: attr }, verified };
           LANGS.forEach(l => { if (t[l]) qtrans.text[l] = t[l]; });
           _translatedQuotes.push(qtrans);
           const enEl = quoteCards[i].querySelector('.q-en');
@@ -1495,7 +1495,8 @@ function addQuoteItem(q = {}) {
       <div class="field"><label>Tekst (EN)</label><textarea rows="2" class="q-en">${esc((q.text&&q.text.en)||'')}</textarea></div>
     </div>
     <div class="row">
-      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(q.attribution||'')}"></div>
+      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(typeof q.attribution === 'object' ? (q.attribution.sr||'') : (q.attribution||''))}">
+</div>
       <div class="check-row" style="margin-top:18px"><input type="checkbox" class="q-verified" ${q.verified?'checked':''} style="width:auto;accent-color:var(--accent)"><label>Verifikovan</label></div>
     </div>`;
   document.getElementById('quotes-list').appendChild(el);
@@ -1546,7 +1547,7 @@ function collectForm() {
   // Quotes
   const quotes = [...document.querySelectorAll('#quotes-list .card')].map(card => ({
     text: { sr: card.querySelector('.q-sr').value, en: card.querySelector('.q-en').value },
-    attribution: card.querySelector('.q-attr').value,
+    attribution: { sr: card.querySelector('.q-attr').value },
     verified: card.querySelector('.q-verified').checked,
   })).filter(q => q.text.sr || q.text.en);
 
