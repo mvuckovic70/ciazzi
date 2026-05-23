@@ -164,9 +164,13 @@ ${langBlock(data.lead)}
       fm += '  - text:\n';
       LANGS.forEach(l => {
         const t = q.text && q.text[l];
-        if (t) fm += `      ${l}: "${t.replace(/"/g, '\\"')}"\n`;
+        if (t) fm += `      ${l}: ${yamlStr(t)}\n`;
       });
-      fm += `    attribution: "${(q.attribution || '').replace(/"/g, '\\"')}"\n`;
+      fm += `    attribution:\n`;
+      LANGS.forEach(l => {
+        const val = (q.attribution && q.attribution[l]) || (typeof q.attribution === 'string' ? q.attribution : '');
+        if (val) fm += `      ${l}: ${yamlStr(val)}\n`;
+      });
       fm += `    verified: ${q.verified ? 'true' : 'false'}\n`;
     });
   }
