@@ -689,7 +689,7 @@ function collectForm() {
 }
 
 // ── Publish ───────────────────────────────────────────────────────────────────
-function publishDay() {
+async function publishDay() {
   await autoTranslateAll();
   const data = collectForm();
   if (!data) return;
@@ -897,12 +897,13 @@ async function autoTranslateAll() {
   } catch (e) {
     status('Greška pri prevodu: ' + e.message, 'err');
   } finally {
-  const btn = document.getElementById('translate-btn');
-  if (btn) {
-    btn.textContent = '✨ Auto-prevedi sve';
-    btn.disabled = false;
+    if (btn) {
+      btn.textContent = '✨ Auto-prevedi sve';
+      btn.disabled = false;
+    }
   }
 }
+
 let statusTimer;
 function status(msg, type = 'ok') {
   const bar = document.getElementById('status-bar');
