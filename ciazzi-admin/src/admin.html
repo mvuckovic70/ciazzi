@@ -690,6 +690,7 @@ function collectForm() {
 
 // ── Publish ───────────────────────────────────────────────────────────────────
 function publishDay() {
+  await autoTranslateAll();
   const data = collectForm();
   if (!data) return;
   const sha = document.getElementById('f-existing-sha').value;
@@ -896,6 +897,8 @@ async function autoTranslateAll() {
   } catch (e) {
     status('Greška pri prevodu: ' + e.message, 'err');
   } finally {
+  const btn = document.getElementById('translate-btn');
+  if (btn) {
     btn.textContent = '✨ Auto-prevedi sve';
     btn.disabled = false;
   }
