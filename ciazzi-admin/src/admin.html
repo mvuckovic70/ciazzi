@@ -256,7 +256,7 @@ h3{font-size:14px;color:#fff;font-weight:500;margin-bottom:10px}
             <div class="lang-tabs" id="title-lang-tabs">
               <div class="lang-tab active" onclick="switchLang('title','sr')">SR</div><div class="lang-tab " onclick="switchLang('title','en')">EN</div><div class="lang-tab " onclick="switchLang('title','de')">DE</div><div class="lang-tab " onclick="switchLang('title','fr')">FR</div><div class="lang-tab " onclick="switchLang('title','it')">IT</div><div class="lang-tab " onclick="switchLang('title','es')">ES</div>
             </div>
-            <button class="btn-ghost btn-sm" onclick="autoTranslateAll()" id="translate-btn">✨ Auto-prevedi sve</button>
+            
           </div>
           <div id="title-lang-sr" style="display:block">
             <div class="field">
@@ -393,12 +393,18 @@ let currentDay = null; // editing existing day
 let _translatedFacts = {};   // {en:[...], de:[...], ...}
 let _translatedClaims = {};  // {en:[...], de:[...], ...}
 let _translatedQuotes = [];  // [{text:{en:'',de:'',...}, ...}]
+let _bodyTranslations = {};  // {sr:'...', en:'...', ...}
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 function doLogin() {
   const pw = document.getElementById('login-pw').value;
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
   fetch('/api/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password:pw}) })
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok && r.status !== 401) throw new Error('Worker greška: HTTP ' + r.status);
+      return r.json();
+    })
     .then(d => {
       if (d.ok) {
         PASSWORD = pw;
@@ -407,8 +413,13 @@ function doLogin() {
         document.getElementById('app').style.display = 'flex';
         loadDays();
       } else {
-        document.getElementById('login-err').style.display = 'block';
+        errEl.textContent = 'Pogrešna lozinka.';
+        errEl.style.display = 'block';
       }
+    })
+    .catch(e => {
+      errEl.textContent = 'Greška pri konekciji: ' + e.message;
+      errEl.style.display = 'block';
     });
 }
 
@@ -529,6 +540,8 @@ function populateForm(data, slug, sha) {
 
   // Body
   document.getElementById('f-body').value = data.body || '';
+  // Store existing body translations so they're preserved if body not changed
+  if (data.bodyTranslations) _bodyTranslations = data.bodyTranslations;
 
   // Load day media
   loadDayMedia(data.date || slug);
@@ -554,6 +567,10 @@ function resetForm() {
   document.getElementById('f-body').value = '';
   document.getElementById('day-media-grid').innerHTML = '';
   document.getElementById('form-title').textContent = 'Novi dan';
+  _translatedFacts = {};
+  _translatedClaims = {};
+  _translatedQuotes = [];
+  _bodyTranslations = {};
 }
 
 // ── Facts/Claims/Quotes editors ───────────────────────────────────────────────
@@ -601,7 +618,7 @@ function addQuoteItem(q = {}) {
       <div class="field"><label>Tekst (EN)</label><textarea rows="2" class="q-en">${esc((q.text&&q.text.en)||'')}</textarea></div>
     </div>
     <div class="row">
-      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(typeof q.attribution === 'object' ? (q.attribution.sr||'') : (q.attribution||''))}"></div>
+      <div class="field"><label>Atribucija</label><input type="text" class="q-attr" value="${esc(q.attribution||'')}"></div>
       <div class="check-row" style="margin-top:18px"><input type="checkbox" class="q-verified" ${q.verified?'checked':''} style="width:auto;accent-color:var(--accent)"><label>Verifikovan</label></div>
     </div>`;
   document.getElementById('quotes-list').appendChild(el);
@@ -652,7 +669,7 @@ function collectForm() {
   // Quotes
   const quotes = [...document.querySelectorAll('#quotes-list .card')].map(card => ({
     text: { sr: card.querySelector('.q-sr').value, en: card.querySelector('.q-en').value },
-    attribution: { sr: card.querySelector('.q-attr').value },
+    attribution: card.querySelector('.q-attr').value,
     verified: card.querySelector('.q-verified').checked,
   })).filter(q => q.text.sr || q.text.en);
 
@@ -690,11 +707,90 @@ function collectForm() {
 
 // ── Publish ───────────────────────────────────────────────────────────────────
 async function publishDay() {
-  await autoTranslateAll();
   const data = collectForm();
   if (!data) return;
-  const sha = document.getElementById('f-existing-sha').value;
+
+  const btn = document.querySelector('[onclick="publishDay()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Prevodim...'; }
+
+  // Auto-translate everything before publishing
+  try {
+    const LANGS = ['en','de','fr','it','es'];
+    _translatedFacts = {};
+    _translatedClaims = {};
+    _translatedQuotes = [];
+
+    const titleSR = data.title.sr;
+    const leadSR = data.lead.sr;
+
+    if (titleSR) {
+      status('Prevodim naslov...', 'loading');
+      const t = await translateField('title', titleSR);
+      LANGS.forEach(l => { if (t[l]) data.title[l] = data.title[l] || t[l]; });
+    }
+
+    if (leadSR) {
+      status('Prevodim lead...', 'loading');
+      const t = await translateField('lead', leadSR);
+      LANGS.forEach(l => { if (t[l]) data.lead[l] = data.lead[l] || t[l]; });
+    }
+
+    const factsSR = data.facts.sr || [];
+    if (factsSR.length) {
+      status('Prevodim činjenice...', 'loading');
+      const t = await translateField('facts_array', JSON.stringify(factsSR));
+      LANGS.forEach(l => { if (t[l]) data.facts[l] = Array.isArray(t[l]) ? t[l] : factsSR; });
+    }
+
+    const claimsSR = data.claims.sr || [];
+    if (claimsSR.length) {
+      status('Prevodim navode...', 'loading');
+      const claimTexts = claimsSR.map(c => c.text || c);
+      const t = await translateField('claims_array', JSON.stringify(claimTexts));
+      LANGS.forEach(l => {
+        if (t[l]) data.claims[l] = (Array.isArray(t[l]) ? t[l] : claimTexts).map((text, i) => ({
+          text, disputed: claimsSR[i]?.disputed !== false
+        }));
+      });
+    }
+
+    if (data.quotes && data.quotes.length) {
+      status('Prevodim citate...', 'loading');
+      for (let i = 0; i < data.quotes.length; i++) {
+        const srText = data.quotes[i].text?.sr;
+        if (srText) {
+          const t = await translateField('quote', srText);
+          LANGS.forEach(l => { if (t[l]) data.quotes[i].text[l] = data.quotes[i].text[l] || t[l]; });
+        }
+      }
+    }
+
+    if (data.body && data.body.trim()) {
+      status('Prevodim narativ...', 'loading');
+      const t = await translateField('body', data.body);
+      data.bodyTranslations = { sr: data.body };
+      LANGS.forEach(l => { if (t[l]) data.bodyTranslations[l] = t[l]; });
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Objavi ↗'; }
+    const proceed = confirm('Prevod nije uspeo:\n' + e.message + '\n\nIpak objaviti bez prevoda?');
+    if (!proceed) return;
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Objavljujem...'; }
+  }
+
+  if (btn) { btn.textContent = '⏳ Objavljujem...'; }
   status('Objavljujem...', 'loading');
+
+  // Fetch fresh SHA just before posting to avoid conflicts
+  try {
+    const existingDate = document.getElementById('f-existing-date').value || data.date;
+    if (existingDate) {
+      const fileInfo = await apiFetch('/api/day/' + existingDate).then(r => r.json());
+      if (fileInfo._sha) document.getElementById('f-existing-sha').value = fileInfo._sha;
+    }
+  } catch(e) {}
+
+  const sha = document.getElementById('f-existing-sha').value;
   apiFetch('/api/days', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -702,6 +798,7 @@ async function publishDay() {
   })
   .then(r => r.json())
   .then(res => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Objavi ↗'; }
     if (res.ok) {
       status('Objavljeno! Sajt se ažurira za ~90s.', 'ok');
       document.getElementById('f-existing-sha').value = res.sha || '';
@@ -710,7 +807,10 @@ async function publishDay() {
       status('Greška: ' + (res.error || 'nepoznata'), 'err');
     }
   })
-  .catch(e => status('Mrežna greška: ' + e.message, 'err'));
+  .catch(e => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Objavi ↗'; }
+    status('Mrežna greška: ' + e.message, 'err');
+  });
 }
 
 // ── Media upload ──────────────────────────────────────────────────────────────
@@ -821,89 +921,6 @@ async function translateField(field, value) {
   return data.translations || {};
 }
 
-async function autoTranslateAll() {
-  const btn = document.getElementById('translate-btn');
-  const titleSR = document.getElementById('f-title-sr').value;
-  const leadSR = document.getElementById('f-lead-sr').value;
-  const factInputs = [...document.querySelectorAll('#facts-list .list-item input[type=text]')].map(i => i.value).filter(Boolean);
-  const claimInputs = [...document.querySelectorAll('#claims-list .list-item')].map(item => ({
-    text: item.querySelector('input[type=text]').value,
-    disputed: item.querySelector('input[type=checkbox]').checked,
-  })).filter(c => c.text);
-  const quoteCards = [...document.querySelectorAll('#quotes-list .card')];
-
-  if (!titleSR && !leadSR) { status('Unesite najpre srpski naslov i lead!', 'err'); return; }
-
-  btn.textContent = '⏳ Prevodim...';
-  btn.disabled = true;
-  _translatedFacts = {};
-  _translatedClaims = {};
-  _translatedQuotes = [];
-
-  try {
-    const LANGS = ['en','de','fr','it','es'];
-
-    if (titleSR) {
-      status('Prevodim naslov...', 'loading');
-      const t = await translateField('title', titleSR);
-      LANGS.forEach(l => { const el = document.getElementById('f-title-'+l); if (el && t[l]) el.value = t[l]; });
-    }
-
-    if (leadSR) {
-      status('Prevodim lead...', 'loading');
-      const t = await translateField('lead', leadSR);
-      LANGS.forEach(l => { const el = document.getElementById('f-lead-'+l); if (el && t[l]) el.value = t[l]; });
-    }
-
-    if (factInputs.length) {
-      status('Prevodim činjenice...', 'loading');
-      const t = await translateField('facts_array', JSON.stringify(factInputs));
-      LANGS.forEach(l => { if (t[l]) _translatedFacts[l] = Array.isArray(t[l]) ? t[l] : factInputs; });
-    }
-
-    if (claimInputs.length) {
-      status('Prevodim navode...', 'loading');
-      const claimTexts = claimInputs.map(c => c.text);
-      const t = await translateField('claims_array', JSON.stringify(claimTexts));
-      LANGS.forEach(l => {
-        if (t[l]) _translatedClaims[l] = (Array.isArray(t[l]) ? t[l] : claimTexts).map((text, i) => ({
-          text, disputed: claimInputs[i]?.disputed !== false
-        }));
-      });
-    }
-
-    if (quoteCards.length) {
-      status('Prevodim citate...', 'loading');
-      for (let i = 0; i < quoteCards.length; i++) {
-        const srText = quoteCards[i].querySelector('.q-sr').value;
-        const attr = quoteCards[i].querySelector('.q-attr').value;
-        const verified = quoteCards[i].querySelector('.q-verified').checked;
-        const qtrans = { text: { sr: srText }, attribution: { sr: attr }, verified };
-        if (srText) {
-          const t = await translateField('quote', srText);
-          LANGS.forEach(l => { if (t[l]) qtrans.text[l] = t[l]; });
-          const enEl = quoteCards[i].querySelector('.q-en');
-          if (enEl && t.en) enEl.value = t.en;
-        }
-        if (attr) {
-          const ta = await translateField('attribution', attr);
-          LANGS.forEach(l => { if (ta[l]) qtrans.attribution[l] = ta[l]; });
-        }
-        _translatedQuotes.push(qtrans);
-      }
-    }
-
-    status('Prevedeno! Proveri prevode pre objave.', 'ok');
-  } catch (e) {
-    status('Greška pri prevodu: ' + e.message, 'err');
-  } finally {
-    if (btn) {
-      btn.textContent = '✨ Auto-prevedi sve';
-      btn.disabled = false;
-    }
-  }
-}
-
 let statusTimer;
 function status(msg, type = 'ok') {
   const bar = document.getElementById('status-bar');
@@ -916,6 +933,7 @@ function clearStatus() {
   document.getElementById('status-bar').className = 'status-bar';
 }
 
+// ── Utils ─────────────────────────────────────────────────────────────────────
 function esc(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function copyUrl(url) {
   navigator.clipboard.writeText(url).then(() => status('URL kopiran!', 'ok'));
