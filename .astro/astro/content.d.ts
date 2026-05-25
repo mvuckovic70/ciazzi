@@ -159,6 +159,13 @@ declare module 'astro:content' {
   collection: "days";
   data: InferEntrySchema<"days">
 } & { render(): Render[".mdx"] };
+"2024-11-02.mdx": {
+	id: "2024-11-02.mdx";
+  slug: "2024-11-02";
+  body: string;
+  collection: "days";
+  data: InferEntrySchema<"days">
+} & { render(): Render[".mdx"] };
 "2024-11-22.mdx": {
 	id: "2024-11-22.mdx";
   slug: "2024-11-22";

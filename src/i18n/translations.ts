@@ -123,7 +123,7 @@ export function useTranslation(lang: Lang) {
 // Format a date string "2024-11-01" for display per locale
 export function formatDate(isoDate: string, lang: Lang): string {
   const localeMap: Record<Lang, string> = {
-    sr: 'sr-RS', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', es: 'es-ES',
+    sr: 'sr-Latn-RS', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', es: 'es-ES',
   };
   return new Date(isoDate).toLocaleDateString(localeMap[lang], {
     day: 'numeric', month: 'long', year: 'numeric',

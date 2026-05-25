@@ -1,0 +1,502 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getDayView, renderPlainMarkdown } from '../lib/dayView';
+import { useTranslation } from '../i18n/translations';
+import type { Lang } from '../i18n/translations';
+
+interface Props {
+  day: CollectionEntry<'days'>;
+  lang: Lang;
+}
+
+const { day, lang } = Astro.props;
+const tr = useTranslation(lang);
+const view = getDayView(day, lang);
+const heroImage = view.media.find((item) => item.type === 'foto')?.src ?? view.thumbnail.src;
+const bodyTranslation = view.bodyTranslation;
+---
+
+<article class="day-article">
+  <a href={view.homeUrl} class="back">
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
+    {tr('back')}
+  </a>
+
+  <header class="day-hero">
+    <div class="hero-text">
+      <p class="eyebrow">{view.dateLabel}</p>
+      <h1>{view.title}</h1>
+      <p class="lead">{view.lead}</p>
+      <div class="tag-row">
+        {view.categories.map((cat) => (
+          <span class="tag" style={`background:${cat.color.bg};color:${cat.color.text};`}>
+            {cat.label}
+          </span>
+        ))}
+      </div>
+    </div>
+    <figure class="hero-media">
+      <img
+        src={heroImage}
+        alt={view.thumbnail.alt}
+        loading="eager"
+        onerror="this.closest('.hero-media')?.classList.add('image-failed')"
+      />
+    </figure>
+  </header>
+
+  {(view.hasFacts || view.hasClaims) && (
+    <section class="evidence-grid" aria-label="Evidence">
+      {view.hasFacts && (
+        <div class="evidence fact">
+          <h2>
+            <i class="ti ti-check" aria-hidden="true"></i>
+            {tr('factLabel')}
+          </h2>
+          <ul>
+            {view.facts.map((fact) => <li>{fact}</li>)}
+          </ul>
+        </div>
+      )}
+      {view.hasClaims && (
+        <div class="evidence claim">
+          <h2>
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            {tr('claimLabel')}
+          </h2>
+          <ul>
+            {view.claims.map((claim) => (
+              <li>
+                {claim.text}
+                {claim.disputed && <span class="note"> - {tr('disputed')}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  )}
+
+  {view.media.length > 0 && (
+    <section class="media-strip" aria-label="Media">
+      {view.media.slice(0, 6).map((item) => (
+        <figure class="media-item">
+          {item.embedUrl ? (
+            <iframe
+              src={item.embedUrl}
+              title={item.caption}
+              loading="lazy"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          ) : (
+            <img
+              src={item.src}
+              alt={item.caption}
+              loading="lazy"
+              onerror="this.closest('.media-item')?.classList.add('image-failed')"
+            />
+          )}
+          {item.caption && <figcaption>{item.caption}</figcaption>}
+        </figure>
+      ))}
+    </section>
+  )}
+
+  <div class="story-layout">
+    <div class="prose">
+      {bodyTranslation ? <Fragment set:html={renderPlainMarkdown(bodyTranslation)} /> : <slot />}
+    </div>
+
+    <aside class="source-rail" aria-labelledby="sources-title">
+      <h2 id="sources-title">{tr('sourcesLabel')}</h2>
+      <div class="source-list">
+        {view.sources.map((source) => (
+          <div class="source-item">
+            {source.url ? (
+              <a href={source.url} target="_blank" rel="noopener noreferrer">
+                <span>{source.label}</span>
+                <i class="ti ti-external-link" aria-hidden="true"></i>
+              </a>
+            ) : (
+              <span>{source.label}</span>
+            )}
+            {source.archiveUrl && (
+              <a class="archive-link" href={source.archiveUrl} target="_blank" rel="noopener noreferrer">
+                <i class="ti ti-archive" aria-hidden="true"></i>
+                Archive
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </aside>
+  </div>
+
+  {view.quotes.length > 0 && (
+    <section class="quotes" aria-label="Quotes">
+      {view.quotes.map((quote) => (
+        <figure class="quote-block">
+          <blockquote>{quote.text}</blockquote>
+          <figcaption>
+            {quote.attribution}
+            {!quote.verified && <span class="note"> - {tr('disputed')}</span>}
+          </figcaption>
+        </figure>
+      ))}
+    </section>
+  )}
+</article>
+
+<style>
+  .day-article {
+    padding: 28px 0 10px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    margin-bottom: 20px;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .back:hover {
+    color: var(--text);
+  }
+
+  .day-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(340px, 0.72fr);
+    gap: 28px;
+    align-items: stretch;
+    padding-bottom: 34px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-text {
+    min-height: 390px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 14px;
+    color: var(--accent-strong);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    max-width: 860px;
+    margin: 0;
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: clamp(38px, 5.7vw, 66px);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: 0;
+  }
+
+  .lead {
+    max-width: 760px;
+    margin: 24px 0 0;
+    color: var(--text-muted);
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.48;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .hero-media {
+    position: relative;
+    min-height: 390px;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-muted);
+  }
+
+  .hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.86) contrast(1.05);
+  }
+
+  .hero-media.image-failed img,
+  .media-item.image-failed img {
+    display: none;
+  }
+
+  .media-item.image-failed {
+    min-height: 190px;
+  }
+
+  .hero-media.image-failed::before,
+  .media-item.image-failed::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(212,61,50,0.24), rgba(21,23,27,0.88)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 16px);
+  }
+
+  .hero-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 58%, rgba(16,17,20,0.4));
+    pointer-events: none;
+  }
+
+  .evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 28px 0;
+  }
+
+  .evidence {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+  }
+
+  .evidence.fact {
+    border-color: var(--fact-border);
+    background: var(--fact-bg);
+  }
+
+  .evidence.claim {
+    border-color: var(--claim-border);
+    background: var(--claim-bg);
+  }
+
+  .evidence h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .evidence ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+  }
+
+  .evidence li {
+    margin: 8px 0;
+    padding-left: 3px;
+  }
+
+  .media-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  .media-item {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-muted);
+  }
+
+  .media-item img,
+  .media-item iframe {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 0;
+  }
+
+  .media-item figcaption {
+    padding: 10px 12px 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  .story-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) minmax(260px, 1fr);
+    gap: 38px;
+    align-items: start;
+    margin-top: 36px;
+  }
+
+  .prose {
+    color: var(--text-muted);
+    font-size: 18px;
+    line-height: 1.75;
+  }
+
+  .prose :global(h1),
+  .prose :global(h2),
+  .prose :global(h3) {
+    color: var(--text);
+    font-family: var(--font-serif);
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .prose :global(h1) {
+    font-size: 36px;
+    margin: 36px 0 12px;
+  }
+
+  .prose :global(h2) {
+    font-size: 32px;
+    margin: 36px 0 12px;
+  }
+
+  .prose :global(h3) {
+    font-size: 24px;
+    margin: 30px 0 10px;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 20px;
+  }
+
+  .prose :global(a) {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: rgba(212,61,50,0.75);
+    text-underline-offset: 4px;
+  }
+
+  .prose :global(strong) {
+    color: var(--text);
+  }
+
+  .source-rail {
+    position: sticky;
+    top: 92px;
+    border-left: 1px solid var(--border);
+    padding-left: 18px;
+  }
+
+  .source-rail h2 {
+    margin: 0 0 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+  }
+
+  .source-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .source-item {
+    display: grid;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(255,253,248,0.9);
+    padding: 10px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .source-item a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .archive-link {
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  .quotes {
+    max-width: 840px;
+    margin-top: 42px;
+  }
+
+  .quote-block {
+    margin: 0 0 18px;
+    padding: 4px 0 4px 20px;
+    border-left: 3px solid var(--accent);
+  }
+
+  blockquote {
+    margin: 0 0 8px;
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: clamp(25px, 4vw, 38px);
+    font-style: italic;
+    line-height: 1.17;
+  }
+
+  figcaption,
+  .note {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  @media (max-width: 980px) {
+    .day-hero,
+    .story-layout {
+      grid-template-columns: 1fr;
+    }
+    .hero-text,
+    .hero-media {
+      min-height: auto;
+    }
+    .hero-media {
+      aspect-ratio: 16 / 10;
+    }
+    .source-rail {
+      position: static;
+      border-left: 0;
+      padding-left: 0;
+    }
+    .media-strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .day-article {
+      padding-top: 20px;
+    }
+    h1 {
+      font-size: clamp(39px, 14vw, 56px);
+    }
+    .evidence-grid,
+    .media-strip {
+      grid-template-columns: 1fr;
+    }
+    .prose {
+      font-size: 16px;
+    }
+  }
+</style>

@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { CAT_LABELS, formatDate, useTranslation } from '../i18n/translations';
-import { astroSlugToUrl } from '../i18n/slugUtils';
+import { getDayView } from '../lib/dayView';
 import type { Lang } from '../i18n/translations';
 
 interface Props {
@@ -10,111 +9,211 @@ interface Props {
 }
 
 const { day, lang } = Astro.props;
-const { data } = day;
-const tr = useTranslation(lang);
-
-const title = data.title[lang] ?? data.title['sr'];
-const lead = data.lead[lang] ?? data.lead['sr'];
-const hasFacts = (data.facts?.[lang] ?? data.facts?.['sr'])?.length;
-const hasClaims = (data.claims?.[lang] ?? data.claims?.['sr'])?.length;
-
-const urlSlug = astroSlugToUrl(day.slug);
-const dayUrl = lang === 'sr' ? `/dan/${urlSlug}` : `/${lang}/dan/${urlSlug}`;
-
-// Category color map
-const CAT_COLORS: Record<string, {bg:string,text:string}> = {
-  tragedija: { bg: 'rgba(193,18,31,.18)',   text: '#f3b0b0' },
-  pokret:    { bg: 'rgba(239,159,39,.16)',   text: '#f0c178' },
-  korupcija: { bg: 'rgba(127,119,221,.18)',  text: '#c5bff2' },
-  policija:  { bg: 'rgba(55,138,221,.16)',   text: '#9cc4ef' },
-  politika:  { bg: 'rgba(29,158,117,.16)',   text: '#7fd3b6' },
-  svet:      { bg: 'rgba(136,135,128,.2)',   text: '#d6d1c6' },
-};
+const view = getDayView(day, lang);
+const primaryCategory = view.categories[0];
 ---
 
-<a href={dayUrl} class="day-card" data-cats={data.categories.join(',')}>
-  <div class="thumb">
-    {typeof data.thumbnail.src === 'string' ? (
-      <img src={data.thumbnail.src} alt={data.thumbnail.alt[lang] ?? ''} loading="lazy" />
-    ) : (
-      <img src={data.thumbnail.src.src} alt={data.thumbnail.alt[lang] ?? ''} loading="lazy" />
-    )}
-    <span class="badge">{tr(`media${data.thumbnail.type.charAt(0).toUpperCase() + data.thumbnail.type.slice(1)}`)}</span>
+<a href={view.url} class="day-card" data-cats={view.categories.map((cat) => cat.key).join(',')}>
+  <div class="media">
+    <img
+      src={view.thumbnail.src}
+      alt={view.thumbnail.alt}
+      loading="lazy"
+      onerror="this.closest('.media')?.classList.add('image-failed')"
+    />
+    <span class="media-type">{view.thumbnail.badge}</span>
   </div>
 
-  <div class="body">
+  <div class="content">
     <div class="meta">
-      <span class="date">{formatDate(data.date, lang)}</span>
-      {data.categories.slice(0, 2).map(cat => {
-        const c = CAT_COLORS[cat] ?? CAT_COLORS['svet'];
-        return (
-          <span class="tag" style={`background:${c.bg};color:${c.text};`}>
-            {CAT_LABELS[lang][cat]}
-          </span>
-        );
-      })}
+      <time datetime={view.date}>{view.dateLabel}</time>
+      {primaryCategory && (
+        <span class="tag" style={`background:${primaryCategory.color.bg};color:${primaryCategory.color.text};`}>
+          {primaryCategory.label}
+        </span>
+      )}
     </div>
 
-    <h3 class="title">{title}</h3>
-    <p class="lead-text">{lead}</p>
+    <h3>{view.title}</h3>
+    <p>{view.lead}</p>
 
-    <div class="pills">
-      {hasFacts  && <span class="tag pill-fact"><i class="ti ti-check" aria-hidden="true"></i>{tr('factLabel').split('—')[0].trim()}</span>}
-      {hasClaims && <span class="tag pill-claim"><i class="ti ti-alert-triangle" aria-hidden="true"></i>{tr('claimLabel').split('—')[0].trim()}</span>}
+    <div class="signals">
+      {view.hasFacts && (
+        <span class="signal fact">
+          <i class="ti ti-check" aria-hidden="true"></i>
+          {view.facts.length}
+        </span>
+      )}
+      {view.hasClaims && (
+        <span class="signal claim">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+          {view.claims.length}
+        </span>
+      )}
+      {view.sources.length > 0 && (
+        <span class="signal source">
+          <i class="ti ti-link" aria-hidden="true"></i>
+          {view.sources.length}
+        </span>
+      )}
     </div>
   </div>
 </a>
 
 <style>
-.day-card {
-  display: block;
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color .2s, transform .2s;
-  text-decoration: none;
-  color: inherit;
-}
-.day-card:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
-}
-.thumb {
-  height: 140px;
-  background: var(--surface2);
-  position: relative;
-  overflow: hidden;
-}
-.thumb img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-}
-.badge {
-  position: absolute; top: 8px; left: 8px;
-  font-size: 10px; letter-spacing: .5px;
-  background: rgba(0,0,0,.65); color: #eee;
-  padding: 3px 7px; border-radius: 5px;
-}
-.body { padding: 13px 15px 16px; }
-.meta {
-  display: flex; align-items: center;
-  gap: 6px; flex-wrap: wrap; margin-bottom: 7px;
-}
-.date {
-  font-size: 11px; color: var(--text-dim);
-  font-family: var(--font-mono);
-}
-.title {
-  font-family: var(--font-serif);
-  font-size: 16px; color: #f3efe7;
-  line-height: 1.3; margin: 0 0 6px;
-  font-weight: 700;
-}
-.lead-text {
-  font-size: 13px; color: var(--text-muted);
-  margin: 0 0 10px; line-height: 1.5;
-}
-.pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .day-card {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 253, 248, 0.92);
+    box-shadow: 0 16px 42px rgba(33, 38, 46, 0.07);
+    color: #fffdf8;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .day-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+    background: var(--surface-raised);
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--surface-muted);
+    overflow: hidden;
+  }
+
+  .media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.04);
+    transition: transform 240ms ease;
+  }
+
+  .media.image-failed img {
+    display: none;
+  }
+
+  .media.image-failed::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(212,61,50,0.26), rgba(29,32,38,0.94)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 16px);
+  }
+
+  .day-card:hover .media img {
+    transform: scale(1.035);
+  }
+
+  .media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 48%, rgba(16,17,20,0.72));
+  }
+
+  .media-type {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(16,17,20,0.76);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  time {
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 650;
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  p {
+    margin: 12px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .signals {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 18px;
+  }
+
+  .signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 0 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .signal.fact {
+    color: var(--fact-text);
+    border-color: var(--fact-border);
+    background: var(--fact-bg);
+  }
+
+  .signal.claim {
+    color: var(--claim-text);
+    border-color: var(--claim-border);
+    background: var(--claim-bg);
+  }
+
+  .signal.source {
+    margin-left: auto;
+  }
+
+  @media (max-width: 640px) {
+    h3 {
+      font-size: 23px;
+    }
+  }
 </style>
