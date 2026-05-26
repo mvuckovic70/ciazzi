@@ -39,6 +39,11 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
         <dd>6</dd>
       </div>
     </dl>
+
+    <section class="movement-chyron" aria-label={tr('movementLabel')}>
+      <strong>{tr('movementLabel')}</strong>
+      <span>{tr('movementChyron')}</span>
+    </section>
   </div>
 
   <figure class="collapse-video">
@@ -53,11 +58,6 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       aria-label="Snimak pada nadstresnice"
     ></video>
   </figure>
-</section>
-
-<section class="movement-chyron" aria-label={tr('movementLabel')}>
-  <strong>{tr('movementLabel')}</strong>
-  <span>{tr('movementChyron')}</span>
 </section>
 
 <section class="name-note" aria-label={tr('aboutName')}>
@@ -194,15 +194,14 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
 
   .movement-chyron {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 18px;
-    align-items: center;
-    margin: 4px 0 16px;
-    padding: 16px 18px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: min(100%, 680px);
+    margin: 24px 0 0;
+    padding: 14px 0;
     border-block: 1px solid rgba(174, 42, 39, 0.22);
-    background: rgba(255, 253, 248, 0.58);
     color: var(--text-muted);
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.5;
   }
 
@@ -384,8 +383,7 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       aspect-ratio: 4 / 5;
     }
     .movement-chyron {
-      grid-template-columns: 1fr;
-      gap: 8px;
+      margin-top: 18px;
       padding: 14px 0;
       font-size: 14px;
     }
