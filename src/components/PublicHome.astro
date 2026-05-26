@@ -35,6 +35,10 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
         <dd>16</dd>
       </div>
       <div>
+        <dt>{tr('statStolen')}</dt>
+        <dd>15</dd>
+      </div>
+      <div>
         <dt>{tr('statPeople')}</dt>
         <dd>{(500000).toLocaleString(numberLocale)}</dd>
       </div>
@@ -139,7 +143,7 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
 
   .stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1px;
     width: min(100%, 680px);
     margin: 36px 0 0;
@@ -367,7 +371,7 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       font-size: 14px;
     }
     .stats {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-top: 24px;
     }
     .stats div {
