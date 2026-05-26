@@ -55,6 +55,11 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
   </figure>
 </section>
 
+<section class="movement-chyron" aria-label={tr('movementLabel')}>
+  <strong>{tr('movementLabel')}</strong>
+  <span>{tr('movementChyron')}</span>
+</section>
+
 <section class="silence-band" aria-label={tr('silence')}>
   <i class="ti ti-clock-hour-11" aria-hidden="true"></i>
   <span>{tr('silence')}</span>
@@ -181,6 +186,29 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
     object-fit: cover;
   }
 
+  .movement-chyron {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+    margin: 4px 0 16px;
+    padding: 16px 18px;
+    border-block: 1px solid rgba(174, 42, 39, 0.22);
+    background: rgba(255, 253, 248, 0.58);
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .movement-chyron strong {
+    color: var(--accent-strong);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .silence-band {
     display: flex;
     align-items: center;
@@ -304,6 +332,12 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
     }
     .collapse-video {
       aspect-ratio: 4 / 5;
+    }
+    .movement-chyron {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 14px 0;
+      font-size: 14px;
     }
     .silence-band {
       align-items: flex-start;
