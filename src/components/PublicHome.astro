@@ -2,7 +2,6 @@
 import type { CollectionEntry } from 'astro:content';
 import DayCard from './DayCard.astro';
 import { CAT_LABELS, useTranslation } from '../i18n/translations';
-import { getDayView } from '../lib/dayView';
 import type { Lang } from '../i18n/translations';
 
 interface Props {
@@ -17,8 +16,7 @@ const categories = ['tragedija', 'pokret', 'korupcija', 'policija', 'politika', 
 const start = new Date('2024-11-01T00:00:00+01:00').getTime();
 const dayCount = Math.max(1, Math.round((Date.now() - start) / 86_400_000));
 const numberLocale = lang === 'sr' ? 'sr-Latn-RS' : lang;
-const featured = days.find((day) => day.data.date === '2024-11-01') ?? days.find((day) => day.data.important) ?? days[0];
-const featuredView = featured ? getDayView(featured, lang) : null;
+const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -43,23 +41,18 @@ const featuredView = featured ? getDayView(featured, lang) : null;
     </dl>
   </div>
 
-  {featuredView && (
-    <a class="featured" href={featuredView.url}>
-      <img
-        src={featuredView.thumbnail.src}
-        alt={featuredView.thumbnail.alt}
-        loading="eager"
-        onerror="this.closest('.featured')?.classList.add('image-failed')"
-      />
-      <div class="featured-shade"></div>
-      <div class="featured-body">
-        <span class="featured-label">{tr('readMore')}</span>
-        <h2>{featuredView.title}</h2>
-        <p>{featuredView.lead}</p>
-        <span class="featured-date">{featuredView.dateLabel}</span>
-      </div>
-    </a>
-  )}
+  <figure class="collapse-video">
+    <video
+      src={collapseVideoSrc}
+      controls
+      muted
+      autoplay
+      loop
+      playsinline
+      preload="metadata"
+      aria-label="Snimak pada nadstresnice"
+    ></video>
+  </figure>
 </section>
 
 <section class="silence-band" aria-label={tr('silence')}>
@@ -170,82 +163,22 @@ const featuredView = featured ? getDayView(featured, lang) : null;
     line-height: 1;
   }
 
-  .featured {
+  .collapse-video {
     position: relative;
     min-height: 410px;
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--surface-muted);
-    isolation: isolate;
+    margin: 0;
   }
 
-  .featured img {
+  .collapse-video video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: saturate(0.85) contrast(1.05);
-    transform: scale(1.01);
-  }
-
-  .featured.image-failed img {
-    display: none;
-  }
-
-  .featured.image-failed::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(135deg, rgba(212,61,50,0.3), rgba(21,23,27,0.8)),
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 18px);
-  }
-
-  .featured-shade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(180deg, rgba(16,17,20,0.05), rgba(16,17,20,0.82) 64%, rgba(16,17,20,0.95)),
-      linear-gradient(90deg, rgba(16,17,20,0.42), transparent);
-  }
-
-  .featured-body {
-    position: absolute;
-    inset: auto 0 0;
-    padding: 26px;
-  }
-
-  .featured-label,
-  .featured-date {
-    display: inline-flex;
-    color: #fffdf8;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .featured-label {
-    color: #ffb3ab;
-    margin-bottom: 10px;
-  }
-
-  .featured h2 {
-    max-width: 520px;
-    margin: 0;
-    color: #fffdf8;
-    font-family: var(--font-serif);
-    font-size: clamp(20px, 2.2vw, 27px);
-    line-height: 1.12;
-  }
-
-  .featured p {
-    max-width: 560px;
-    margin: 14px 0 16px;
-    color: rgba(255,253,248,0.82);
-    font-size: 14px;
   }
 
   .silence-band {
@@ -332,10 +265,10 @@ const featuredView = featured ? getDayView(featured, lang) : null;
       padding-top: 38px;
     }
     .hero-copy,
-    .featured {
+    .collapse-video {
       min-height: auto;
     }
-    .featured {
+    .collapse-video {
       aspect-ratio: 16 / 10;
     }
     .day-grid {
@@ -369,11 +302,8 @@ const featuredView = featured ? getDayView(featured, lang) : null;
     .stats dt {
       font-size: 10px;
     }
-    .featured {
+    .collapse-video {
       aspect-ratio: 4 / 5;
-    }
-    .featured-body {
-      padding: 20px;
     }
     .silence-band {
       align-items: flex-start;
