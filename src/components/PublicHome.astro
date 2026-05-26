@@ -44,10 +44,6 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       </div>
     </dl>
 
-    <section class="movement-chyron" aria-label={tr('movementLabel')}>
-      <strong>{tr('movementLabel')}</strong>
-      <span>{tr('movementChyron')}</span>
-    </section>
   </div>
 
   <figure class="collapse-video">
@@ -62,6 +58,11 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       aria-label="Snimak pada nadstresnice"
     ></video>
   </figure>
+</section>
+
+<section class="movement-chyron" aria-label={tr('movementLabel')}>
+  <strong>{tr('movementLabel')}</strong>
+  <span>{tr('movementChyron')}</span>
 </section>
 
 <section class="name-note" aria-label={tr('aboutName')}>
@@ -201,19 +202,19 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
   .movement-chyron {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
-    width: min(100%, 680px);
-    margin: 24px 0 0;
-    padding: 14px 0;
+    gap: 18px;
+    width: 100%;
+    margin: 30px 0 38px;
+    padding: 30px 0;
     border-block: 1px solid rgba(174, 42, 39, 0.22);
     color: var(--text-muted);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: clamp(19px, 2vw, 24px);
+    line-height: 1.55;
   }
 
   .movement-chyron strong {
     color: var(--accent-strong);
-    font-size: 12px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -390,9 +391,13 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       aspect-ratio: 4 / 5;
     }
     .movement-chyron {
-      margin-top: 18px;
-      padding: 14px 0;
+      margin: 22px 0 26px;
+      padding: 22px 0;
+      font-size: 18px;
+    }
+    .movement-chyron strong {
       font-size: 14px;
+      white-space: normal;
     }
     .name-note {
       margin: 14px 0 16px;
