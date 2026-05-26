@@ -18,6 +18,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Remove admin from public build
+        run: rm -rf dist/admin
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
         env:
