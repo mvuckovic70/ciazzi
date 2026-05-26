@@ -60,6 +60,12 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
   <span>{tr('movementChyron')}</span>
 </section>
 
+<section class="name-note" aria-label={tr('aboutName')}>
+  <h2>{tr('siteNameTitle')} <span>/ˈtʃat.tsi/</span></h2>
+  <p><em>{tr('siteNameNoun')}</em> · {tr('siteNameBody')}</p>
+  <p class="name-note-final">{tr('siteNameFinal')}</p>
+</section>
+
 <section class="silence-band" aria-label={tr('silence')}>
   <i class="ti ti-clock-hour-11" aria-hidden="true"></i>
   <span>{tr('silence')}</span>
@@ -209,6 +215,50 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
     white-space: nowrap;
   }
 
+  .name-note {
+    max-width: 980px;
+    margin: 18px 0 18px;
+    padding: 22px 24px;
+    border: 1px solid rgba(42, 47, 56, 0.14);
+    border-left: 4px solid var(--accent-strong);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 253, 248, 0.76);
+    box-shadow: 0 14px 34px rgba(42, 47, 56, 0.06);
+  }
+
+  .name-note h2 {
+    margin: 0 0 14px;
+    color: var(--text);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .name-note h2 span {
+    margin-left: 8px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .name-note p {
+    max-width: 850px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .name-note p + p {
+    margin-top: 14px;
+  }
+
+  .name-note-final {
+    color: var(--text);
+    font-style: italic;
+  }
+
   .silence-band {
     display: flex;
     align-items: center;
@@ -337,6 +387,21 @@ const collapseVideoSrc = '/media/2024-11-01/pad_nadstresnice.mp4';
       grid-template-columns: 1fr;
       gap: 8px;
       padding: 14px 0;
+      font-size: 14px;
+    }
+    .name-note {
+      margin: 14px 0 16px;
+      padding: 18px 16px;
+    }
+    .name-note h2 {
+      font-size: 21px;
+    }
+    .name-note h2 span {
+      display: block;
+      margin: 5px 0 0;
+      font-size: 15px;
+    }
+    .name-note p {
       font-size: 14px;
     }
     .silence-band {
